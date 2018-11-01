@@ -1,0 +1,15 @@
+django>=1.11,<2.0
+djangorestframework
+Pillow
+coreapi
+drf-nested-routers
+
+pytest
+pytest-cov
+pytest-django
+
+ipython
+django-extensions
+pygments
+coreapi-cli
+flake8
