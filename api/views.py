@@ -29,7 +29,11 @@ class RentalViewSet(viewsets.ModelViewSet):
     )
     def upload_img(self, request, pk=None):
         rent = self.get_object()
-        rent.image = request.data['file']
+        image = request.data['file']
+        print(image.file)
+        print(image.name)
+        rent.image = image
+
         rent.save(update_fields=['image'])
         return Response({'status': 'Image accepted.'},
                         status=status.HTTP_202_ACCEPTED)

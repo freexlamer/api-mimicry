@@ -27,7 +27,7 @@ class Rental(TimestampModel):
     )
     rooms = models.IntegerField(default=1)
     price = models.IntegerField()
-    image = models.ImageField()
+    image = models.ImageField(blank=True)
     is_free = models.BooleanField(
         default=True,
     )

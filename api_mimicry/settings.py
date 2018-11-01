@@ -11,6 +11,9 @@ https://docs.djangoproject.com/en/1.11/ref/settings/
 """
 
 import os
+from urllib.parse import quote
+from getenv import env
+import dj_database_url
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -21,12 +24,12 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/1.11/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '5n5!ev4+k_%&9)ltkw=i2#5_*b2mrs2&89@upgwsa4al1n8sox'
+SECRET_KEY = env('SECRET_KEY', required=True)
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = env('DEBUG', default=False)
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = env('ALLOWED_HOSTS', default=['*'])
 
 
 # Application definition
@@ -80,13 +83,10 @@ WSGI_APPLICATION = 'api_mimicry.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/1.11/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-    }
-}
 
+DATABASES = {
+    'default': dj_database_url.parse(env('DATABASE_URL', default='sqlite:///' + quote(os.path.join(BASE_DIR, 'db.sqlite3'))))
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/1.11/ref/settings/#auth-password-validators
@@ -125,6 +125,13 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.11/howto/static-files/
 
 STATIC_URL = '/static/'
+
+DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+AWS_DEFAULT_ACL = None
+AWS_ACCESS_KEY_ID = env('AWS_ACCESS_KEY_ID', required=True)
+AWS_SECRET_ACCESS_KEY = env('AWS_SECRET_ACCESS_KEY', required=True)
+AWS_STORAGE_BUCKET_NAME = env('AWS_STORAGE_BUCKET_NAME', required=True)
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")

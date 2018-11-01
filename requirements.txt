@@ -3,6 +3,10 @@ djangorestframework
 Pillow
 coreapi
 drf-nested-routers
+django-storages
+boto3
+django-getenv
+dj-database-url
 
 pytest
 pytest-cov
