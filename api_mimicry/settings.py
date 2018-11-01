@@ -15,6 +15,8 @@ from urllib.parse import quote
 from getenv import env
 import dj_database_url
 
+import django_heroku
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -142,3 +144,5 @@ AUTH_USER_MODEL = 'core.CoreUser'
 
 if DEBUG:
     EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+django_heroku.settings(locals())
