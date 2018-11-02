@@ -9,12 +9,25 @@ from . import serializers
 from core import models
 
 
-class FeedViewSet(viewsets.ModelViewSet):
+class FeedViewSet(viewsets.ReadOnlyModelViewSet):
+    """Returns events timeline.
+
+    list:
+    Returns list of events. The first element will be the newest event.
+
+    retrieve:
+    Returns event by id.
+
+    """
     serializer_class = serializers.EventSerializer
     queryset = models.Event.objects.all().order_by('-created_date')
 
 
 class RentalViewSet(viewsets.ModelViewSet):
+    """Managing rentals.
+
+
+    """
     serializer_class = serializers.RentalSerializer
     queryset = models.Rental.objects.all()
     event_model = models.Event
@@ -28,6 +41,8 @@ class RentalViewSet(viewsets.ModelViewSet):
         parser_classes=(FileUploadParser,),
     )
     def upload_img(self, request, pk=None):
+        """Uploading image for rental.
+        """
         rent = self.get_object()
         image = request.data['file']
         print(image.file)
@@ -40,6 +55,8 @@ class RentalViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=['post'])
     def view(self, request, pk=None):
+        """Sets view event for rental.
+        """
         obj = self.queryset.get(id=pk)
         if obj.is_free:
             self._create_event(self.event_model.VIEW, obj)
@@ -51,6 +68,8 @@ class RentalViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=['post'])
     def checkin(self, request, pk=None):
+        """Sets checkin event for rental.
+        """
         obj = self.queryset.get(id=pk)
         if obj.is_free:
             self._create_event(self.event_model.CHECK_IN, obj)
@@ -64,6 +83,8 @@ class RentalViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=['post'])
     def checkout(self, request, pk=None):
+        """Sets checkout event for rental.
+        """
         obj = self.queryset.get(id=pk)
         if not obj.is_free:
             self._create_event(self.event_model.CHECK_OUT, obj)
@@ -77,6 +98,8 @@ class RentalViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=['post'])
     def payment(self, request, pk=None):
+        """Make payments event for rental.
+        """
         obj = self.queryset.get(id=pk)
         if not obj.is_free:
             self._create_event(self.event_model.PAYMENT, obj)

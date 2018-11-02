@@ -9,6 +9,7 @@ django-getenv
 dj-database-url
 gunicorn
 django-heroku
+django-rest-swagger
 
 pytest
 pytest-cov
