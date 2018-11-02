@@ -11,7 +11,7 @@ from core import models
 
 class FeedViewSet(viewsets.ModelViewSet):
     serializer_class = serializers.EventSerializer
-    queryset = models.Event.objects.all()
+    queryset = models.Event.objects.all().order_by('-created_date')
 
 
 class RentalViewSet(viewsets.ModelViewSet):

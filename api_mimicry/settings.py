@@ -15,12 +15,15 @@ from urllib.parse import quote
 from getenv import env
 import dj_database_url
 
-import django_heroku
+try:
+    os.environ['DATABASE_URL'] = os.environ['HEROKU_POSTGRESQL_PINK_URL']
+except KeyError:
+    pass
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
-# !! implement import from env !!
+HEROKU = env('HEROKU', default=False)
+AWS_STORAGE = env('AWS_STORAGE', default=False)
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.11/howto/deployment/checklist/
@@ -86,7 +89,9 @@ WSGI_APPLICATION = 'api_mimicry.wsgi.application'
 # https://docs.djangoproject.com/en/1.11/ref/settings/#databases
 
 
-DATABASES = {}
+DATABASES = {
+    'default': dj_database_url.parse(env('DATABASE_URL', default='sqlite:///' + quote(os.path.join(BASE_DIR, 'db.sqlite3'))))
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/1.11/ref/settings/#auth-password-validators
@@ -126,12 +131,13 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
-STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
-AWS_DEFAULT_ACL = None
-AWS_ACCESS_KEY_ID = env('AWS_ACCESS_KEY_ID', required=True)
-AWS_SECRET_ACCESS_KEY = env('AWS_SECRET_ACCESS_KEY', required=True)
-AWS_STORAGE_BUCKET_NAME = env('AWS_STORAGE_BUCKET_NAME', required=True)
+if AWS_STORAGE:
+    DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+    STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+    AWS_DEFAULT_ACL = None
+    AWS_ACCESS_KEY_ID = env('AWS_ACCESS_KEY_ID', required=True)
+    AWS_SECRET_ACCESS_KEY = env('AWS_SECRET_ACCESS_KEY', required=True)
+    AWS_STORAGE_BUCKET_NAME = env('AWS_STORAGE_BUCKET_NAME', required=True)
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
@@ -140,7 +146,14 @@ SITE_ID = 1
 
 AUTH_USER_MODEL = 'core.CoreUser'
 
+REST_FRAMEWORK = {
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
+    'PAGE_SIZE': 10
+}
+
 if DEBUG:
     EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
-django_heroku.settings(locals())
+if HEROKU:
+    import django_heroku
+    django_heroku.settings(locals(), db_colors=True)
